@@ -4,4 +4,5 @@ module flightCode {
 	requires javafx.controls;
 	requires commons.math3;
 	requires org.json;
+	requires json.simple;
 }

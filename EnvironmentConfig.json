@@ -1,0 +1,11 @@
+{
+
+"FileName":"MarsSim_01",
+"Author":"Max",
+
+"InitialState":
+{
+"Position_ECI_x":100.0
+}
+
+}

@@ -47,7 +47,7 @@ public class ReadInput {
 	public static String PropulsionInputFile        = System.getProperty("user.dir") + "/INP/PROP/prop.inp"  ; 
     public static String SC_file 					= System.getProperty("user.dir") + "/INP/SC/sc.inp";
     public static String Aero_file 					= System.getProperty("user.dir") + "/INP/AERO/aeroBasic.inp";
-    public static String ERROR_File 					= System.getProperty("user.dir") + "/INP/ErrorFile.inp";
+    public static String ERROR_File 				= System.getProperty("user.dir") + "/INP/ErrorFile.inp";
 	public static String EventHandler_File			= System.getProperty("user.dir") + "/INP/eventhandler.inp";
     public static String SEQUENCE_File   			= System.getProperty("user.dir") + "/INP/sequence_1.inp";
     public static String sequenceFile 		        = System.getProperty("user.dir") + "/INP/sequenceFile.inp";
@@ -216,48 +216,7 @@ public static List<SequenceContent> readSequenceFile() throws IOException{
  return SequenceSet; 
 }
 //---------------------------------------------------------------------------------------------------
-public static List<ChartSetting> readChartLayout(int numberOfCharts) throws IOException {
-	List<ChartSetting> settings = new ArrayList<>();
-	for(int i=0;i<numberOfCharts;i++) {
-		settings.add(new ChartSetting());
-	}
-    FileInputStream fstream = null;
-    try{
-    		fstream = new FileInputStream(dashboardSettingFile);
-    } catch(IOException eIO) { System.out.println(eIO);}
-    DataInputStream in = new DataInputStream(fstream);
-	BufferedReader br = new BufferedReader(new InputStreamReader(in));
-    String strLine;
-    int k = 0;
-    try {
-    while ((strLine = br.readLine()) != null )   {
-    	String[] tokens = strLine.split(" ");
 
-    	try {
-    	settings.get(k).type = Integer.parseInt(tokens[0]);
-    	} catch (java.lang.NumberFormatException eNFE) {
-    		System.out.println("ERROR: Read Dashboard chart Setting failed. Index: "+k );
-    	}
-    	try {
-    	settings.get(k).x 	 = Integer.parseInt(tokens[1]);
-    	} catch (java.lang.NumberFormatException eNFE) {
-    		System.out.println("ERROR: Read Dashboard chart Setting failed. Index: "+k );
-    	}
-    	try {
-    	settings.get(k).y 	 = Integer.parseInt(tokens[2]);
-    	} catch (java.lang.NumberFormatException eNFE) {
-    		System.out.println("ERROR: Read Dashboard chart Setting failed. Index: "+k );
-    	}
-    	k++;
-    }
-    fstream.close();
-    in.close();
-    br.close();
-    
-   // System.out.println("READ: Propulsion setup successful.");
-    } catch(NullPointerException eNPE) { System.out.println(eNPE); System.out.println("Error: Read Dashboard chart Setting failed.");}
-    return settings;
-}
 //---------------------------------------------------------------------------------------------------
 public static SimulatorInputSet readINP() throws IOException {
 	System.out.println("Input Manager: Reading Input File started ... ");
