@@ -1,22 +1,24 @@
 package utils;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import FlightElement.SpaceShip;
 import FlightElement.GNCModel.SequenceContent;
 import FlightElement.GNCModel.SequenceElement;
-import GUI.FilePaths;
 import Simulator_main.DataSets.IntegratorData;
 import Simulator_main.DataSets.SimulatorInputSet;
+import main.FilePaths;
 
-public class ReadInput {
+public class InputReader {
 /**
  * 
  * 		File path setting for each input file: 
@@ -24,36 +26,26 @@ public class ReadInput {
  * 
  */
 
-	private static boolean integratorSettingFlag=false;
+	 double[] IntegInput =  new double[5];
 	
-	private static int integratorSetting=1;
-	static double[] IntegInput =  new double[5];
+	public  Quaternion qVector = new Quaternion(1,0,0,0);
 	
-	public static Quaternion qVector = new Quaternion(1,0,0,0);
-	
-	static double[][] InertiaTensor   = {{   0 ,  0  ,   0},
+	 double[][] InertiaTensor   = {{   0 ,  0  ,   0},
 			  					  		 {   0 ,  0  ,   0},
 			  					  		 {   0 ,  0  ,   0}};  // Inertia Tensor []
+
+public InputReader() {
 	
-   	public static String[] IntegratorInputPath = {System.getProperty("user.dir") + "/INP/INTEG/00_DormandPrince853Integrator.inp",
+}
+	
+public  String[] IntegratorInputPath = {System.getProperty("user.dir") + "/INP/INTEG/00_DormandPrince853Integrator.inp",
    			System.getProperty("user.dir") + "/INP/INTEG/01_ClassicalRungeKuttaIntegrator.inp",
    			System.getProperty("user.dir") + "/INP/INTEG/02_GraggBulirschStoerIntegrator.inp",
    			System.getProperty("user.dir") + "/INP/INTEG/03_AdamsBashfordIntegrator.inp"
 };
    	
-	public static String INERTIA_File 				= System.getProperty("user.dir") + "/INP/INERTIA.inp";
-	public static String InitialAttitude_File       = System.getProperty("user.dir") + "/INP/INITIALATTITUDE.inp";
-	public static String INPUT_FILE                 = System.getProperty("user.dir") + "/INP/init.inp";
-	public static String PropulsionInputFile        = System.getProperty("user.dir") + "/INP/PROP/prop.inp"  ; 
-    public static String SC_file 					= System.getProperty("user.dir") + "/INP/SC/sc.inp";
-    public static String Aero_file 					= System.getProperty("user.dir") + "/INP/AERO/aeroBasic.inp";
-    public static String ERROR_File 				= System.getProperty("user.dir") + "/INP/ErrorFile.inp";
-	public static String EventHandler_File			= System.getProperty("user.dir") + "/INP/eventhandler.inp";
-    public static String SEQUENCE_File   			= System.getProperty("user.dir") + "/INP/sequence_1.inp";
-    public static String sequenceFile 		        = System.getProperty("user.dir") + "/INP/sequenceFile.inp";
-    public static String dashboardSettingFile 		= System.getProperty("user.dir") + "/INP/GUI/dashboardSetting.inp";
 //------------------------------------------------------	-----------------------------------------------------
-	public static void updateSequenceElements(SequenceElement NewElement, List<SequenceElement> SEQUENCE_DATA){	   
+public  void updateSequenceElements(SequenceElement NewElement, List<SequenceElement> SEQUENCE_DATA){	   
 		   if (SEQUENCE_DATA.size()==0){
 				  SEQUENCE_DATA.add(NewElement); 
 		   } else {
@@ -74,62 +66,11 @@ public class ReadInput {
 		   } 
 	   }	
 //---------------------------------------------------------------------------------------------------
-public static double[] readInput() {
-	double InitialState = 0;
-	double[] inputOut =new double[30];	
-    FileInputStream fstream = null;
-    try{
-    	fstream = new FileInputStream(INPUT_FILE);
-    } catch(IOException eIO) {
-    	System.out.println("Error: Reading Input File produced an Error");
-    	System.out.println(eIO);
-    	}
-    DataInputStream in = new DataInputStream(fstream);
-    @SuppressWarnings("resource")
-	BufferedReader br = new BufferedReader(new InputStreamReader(in));
-    String strLine;
-    int k = 0;
-    try {
-    try {
-		while ((strLine = br.readLine()) != null )   {
-			if(k==12) {
-				// Ignore Date 
-				inputOut[12]=0;
-			} else {
-				String[] tokens = strLine.split(" ");
-				InitialState = Double.parseDouble(tokens[0]);
-				try {
-					inputOut[k]= InitialState;
-				} catch(ArrayIndexOutOfBoundsException eIOOO) {
-					System.out.println("Error: Array index out of bounds detected");
-				}
-			}
-			//System.out.println("" +k+"   "+InitialState);
-			k++;
-		}
-	} catch (NumberFormatException | IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-    try {
-		fstream.close();
-        in.close();
-        br.close();
-	} catch (IOException e) {
-
-		e.printStackTrace();
-	}
-
-    } catch(NullPointerException eNPE) { 
-    	System.out.println("Error: NullPointerException within Reading Input file.");
-    	System.out.println(eNPE);}
-    return inputOut;
-} 
 //---------------------------------------------------------------------------------------------------
-public static List<SequenceContent> readSequenceFile() throws IOException{	
+public  List<SequenceContent> readSequenceFile() throws IOException{	
 	System.out.println("Sequence Manager: Reading Sequences started ... ");
 	List<SequenceContent> SequenceSet = new ArrayList<SequenceContent>();
-	BufferedReader br = new BufferedReader(new FileReader(sequenceFile));
+	BufferedReader br = new BufferedReader(new FileReader(""));
    String strLine;
    String fcSeparator="\\|FlightControllerElements\\|";
    String eventSeparator="\\|EventManagementElements";
@@ -216,65 +157,140 @@ public static List<SequenceContent> readSequenceFile() throws IOException{
  return SequenceSet; 
 }
 //---------------------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------------------------
-public static SimulatorInputSet readINP() throws IOException {
+public  SimulatorInputSet readInput() throws IOException{
 	System.out.println("Input Manager: Reading Input File started ... ");
-    FileInputStream fstream = null;
-    integratorSettingFlag=false;
-    try{
-    fstream = new FileInputStream(FilePaths.inputFile);
-    } catch(IOException eIO) { System.out.println(eIO);}
-    
-    
-    DataInputStream in = new DataInputStream(fstream);
-	BufferedReader br = new BufferedReader(new InputStreamReader(in));
-    String strLine;
-    
     SpaceShip spaceShip = new SpaceShip(); 
     IntegratorData integratorData = new IntegratorData(); 
     SimulatorInputSet simulatorInputSet = new SimulatorInputSet();
     
-    try {
-		    while ((strLine = br.readLine()) != null )   {
-		    	String[] tokens = strLine.split(" ");
-		    	String identifier ="";
-		    	double value=0;
-				    	try {
-				    		identifier = tokens[0];
-				    		value = Double.parseDouble(tokens[1]);
-				    	} catch (java.lang.NumberFormatException eNFE) {  }
-				  spaceShip =   	checkSpaceShip(identifier, value, spaceShip);
-				  integratorData = checkIntegratorData(identifier, value, integratorData);
-		    }
-    fstream.close();
-    in.close();
-    br.close();
-
-   // System.out.println("READ: Propulsion setup successful.");
-    } catch(NullPointerException eNPE) { System.out.println(eNPE); System.out.println("Error: ReadInput/readINP failed.");}
-    /**
-     * 	
-     * 				Finalize data package
-     */
-    try {
-    	spaceShip.getState().setInitialQuaternion(qVector);
-	    if(integratorSettingFlag) {
-			integratorData.setIntegInput(IntegInput);	// !!! Must be called BEFORE .setIntegratorType !!!
-			integratorData.setIntegratorType(integratorSetting);
-	    }
-	    spaceShip.getProperties().getMassAndInertia().setInertiaTensorMatrix(InertiaTensor);
-	    simulatorInputSet.setSpaceShip(spaceShip);
-	    simulatorInputSet.setIntegratorData(integratorData);
-    } catch (Exception ext) {
-    		System.out.println("Error: ReadInput/readINP finilizing data package failed.");
-    		System.out.println(ext);
-    }
-    System.out.println("Input Manager: Reading Input File completed. ");
+	  JSONParser parser = new JSONParser();	  
+	  //JSONObject a = (JSONObject) parser.parse(new FileReader(FilePaths.environmentFile));
+		Object obj;
+		try {
+			
+		  // Read json files to JSONObjet 	
+		  obj = parser.parse(new FileReader(FilePaths.environmentFile));
+		  JSONObject environment = (JSONObject) obj;  
+		  obj = parser.parse(new FileReader(FilePaths.spacecraftFile));
+		  JSONObject spacecraft = (JSONObject) obj;  
+		  
+		  // Display Simulation and File names:
+		  System.out.println("Simulation: "+environment.get("FileName").toString());
+		  System.out.println("Spacecraft: "+spacecraft.get("FileName").toString());
+		  
+		  // Write JSONOBJECT data to respective simulation classes> 
+		  spaceShip = createSpaceship(spacecraft);
+		  integratorData = createIntegratorData(environment);
+		  
+		  // Test outputs
+		  System.out.println(spaceShip.getProperties().getMassAndInertia().getMass());
+		  System.out.println(spaceShip.getState().getInitLongitude());
+		  System.out.println(integratorData.getTargetBody());
+		  
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
     return simulatorInputSet;
 }
 
-private static SpaceShip checkSpaceShip(String identifier, double value, SpaceShip spaceShip) {
+private SpaceShip createSpaceship(JSONObject spacecraft) {
+	SpaceShip spaceShip = new SpaceShip();
+	// Container to load data
+	double value = 0;
+	JSONObject initialState = null;
+	JSONObject propulsionConfig = null;
+	JSONObject gncConfig = null;
+	JSONObject sensorConfig = null;
+	try {
+		 initialState = (JSONObject) spacecraft.get("InitialState");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		 propulsionConfig = (JSONObject) spacecraft.get("PropulsionConfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		 gncConfig = (JSONObject) spacecraft.get("GNCconfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		 sensorConfig = (JSONObject) spacecraft.get("SensorConfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("InitialMass").toString() );
+		spaceShip.getProperties().getMassAndInertia().setMass(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Position_IN_Longitude_deg").toString() );
+		spaceShip.getState().setInitLongitude(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Position_IN_Latitude_deg").toString() );
+		spaceShip.getState().setInitLatitude(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Position_IN_Radius").toString() );
+		spaceShip.getState().setInitRadius(value);;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	
+	return spaceShip;
+}
+
+private IntegratorData createIntegratorData(JSONObject environment) {
+	IntegratorData integratorData = new IntegratorData(); 
+	// Container to load data
+	double value = 0;
+	int intVal = 0;
+	JSONObject integConfig = null;
+	JSONObject envConfig = null;
+	try {
+		integConfig = (JSONObject) environment.get("IntegratorConfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		envConfig = (JSONObject) environment.get("EnvironmentModel");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( envConfig.get("TargetBody_indx").toString() );
+		integratorData.setTargetBody(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	return integratorData;
+}
+/*
+private  SpaceShip checkSpaceShip(String identifier, double value, SpaceShip spaceShip) {
 	if(identifier.equals("Init_LONG")) {
 		spaceShip.getState().setInitLongitude(value*UConst.deg2rad);
 	} else if (identifier.equals("Init_LAT")) {
@@ -372,13 +388,12 @@ private static SpaceShip checkSpaceShip(String identifier, double value, SpaceSh
 	return spaceShip;
 }
 
-private static IntegratorData checkIntegratorData(String identifier, double value, IntegratorData integratorData) {
+private  IntegratorData checkIntegratorData(String identifier, double value, IntegratorData integratorData) {
 			if (identifier.equals("Integ_MaxTime")) {
 		integratorData.setMaxGlobalTime(value);
 		integratorData.setGlobalTime(0);
 	} else if (identifier.equals("Integ_Integrator")) {
-		integratorSetting = (int) value;
-		integratorSettingFlag=true;
+
 	} else if (identifier.equals("Integ_VelVector")) {
 		integratorData.setVelocityVectorCoordSystem((int) value);	
 	} else if (identifier.equals("Env_CenterBody")) {
@@ -438,45 +453,6 @@ private static IntegratorData checkIntegratorData(String identifier, double valu
 	
 	return integratorData;
 }
-/**
- * Test Unit
- * @param args
- */
-public static void main(String[] args) {
-	try {
-		readINP();
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-}
-//---------------------------------------------------------------------------------------------------
-public static String[] getIntegratorInputPath() {
-	return IntegratorInputPath;
-}
-public static String getINERTIA_File() {
-	return INERTIA_File;
-}
-public static String getInitialAttitude_File() {
-	return InitialAttitude_File;
-}
-public static String getINPUT_FILE() {
-	return INPUT_FILE;
-}
-public static String getPropulsionInputFile() {
-	return PropulsionInputFile;
-}
-public static String getSC_file() {
-	return SC_file;
-}
-public static String getERROR_File() {
-	return ERROR_File;
-}
-public static String getEventHandler_File() {
-	return EventHandler_File;
-}
-public static String getSEQUENCE_File() {
-	return SEQUENCE_File;
-}
+*/
 
 }

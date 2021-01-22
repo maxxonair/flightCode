@@ -12,7 +12,7 @@ import Simulator_main.DataSets.IntegratorData;
 import Simulator_main.DataSets.RealTimeContainer;
 import Simulator_main.DataSets.RealTimeResultSet;
 import Simulator_main.DataSets.SimulatorInputSet;
-import utils.ReadInput;
+import utils.InputReader;
 import utils.SRateTransition;
 
 public class Simulation {
@@ -30,6 +30,7 @@ public class Simulation {
 	 // Include progress report (sim time & progress percentage):
 	 private boolean isProgressReport;
 	 private double progressStep ;
+	 private InputReader inputReader = new InputReader();
 	
 	
 	public Simulation(boolean isProgressReport, double progressStep) {
@@ -58,7 +59,7 @@ public class Simulation {
 	    	System.out.println("Read: Create simulation input file");
 	    	SimulatorInputSet simulatorInputSet = new SimulatorInputSet();
 			try {
-				simulatorInputSet = ReadInput.readINP();
+				simulatorInputSet = inputReader.readInput();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -92,7 +93,7 @@ public class Simulation {
 	    		integratorData.getNoiseModel().setActuatorNoiseModel(true);
 	    		//--------------------------------------------------------------------------------------
 	        	try {
-					spaceShip.getProperties().getSequence().setSequenceSet(ReadInput.readSequenceFile());
+					spaceShip.getProperties().getSequence().setSequenceSet(inputReader.readSequenceFile());
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

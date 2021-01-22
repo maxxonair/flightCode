@@ -3,9 +3,28 @@
 "FileName":"MarsSim_01",
 "Author":"Max",
 
-"InitialState":
+"EnvironmentModel":
 {
-"Position_ECI_x":100.0
+  "TargetBody_indx":2,
+  "TargetBody_ReferenceElevation":0.0,
+  "AtmosphericDragModel_indx":0,
+  "ConstAtmosphericDragCoeff":1.4,
+  "ParachuteModel_indx":1,
+  "ParachuteConstDragCoeff":0.8
+},
+
+"IntegratorConfig":{
+"Integrator_index":1,
+"IntegratorFrequency":2,
+"CoordinateSystem_indx":0,
+"DegreeOfFreedom":6,
+"IntegrationTime_s":500,
+"StepSize_s":0.5,
+"NumberOfSteps":10,
+"MinimumStepsize_s":0.0,
+"MaximumStepsize_s":0.0,
+"AbsoluteTolerance":0.0,
+"RelativeTolerance":0.0,
 }
 
 }

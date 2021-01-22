@@ -1,0 +1,41 @@
+{
+  "FileName":"FireFly",
+  "Author":"Max",
+
+  "InitialState":
+  {
+  "Time_0_ET_s":0,
+  "InitialMass":2000,
+  "Position_IN_x":0.0,
+  "Position_IN_y":0.0,
+  "Position_IN_z":0.0,
+  "Position_IN_Longitude_deg":175.0,
+  "Position_IN_Latitude_deg":-45.0,
+  "Position_IN_Radius":3399500,
+  "Velocity_magnitude":3400.1,
+  "FlightPathAngle_deg":-16.0,
+  "Azimuth_deg":210.0,
+  "Attitude_Quaternion_IN_from_SCB_w":0.9624462,
+  "Attitude_Quaternion_IN_from_SCB_x":0.12031405,
+  "Attitude_Quaternion_IN_from_SCB_y":0.23869953,
+  "Attitude_Quaternion_IN_from_SCB_z":0.11329348,
+  "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_x":0.0,
+  "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_y":0.0,
+  "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_z":0.0,
+  }
+
+  "PropulsionConfig":
+  {
+
+  },
+
+  "GNCconfig":
+  {
+
+  },
+
+  "SensorConfig":
+  {
+
+  }
+}

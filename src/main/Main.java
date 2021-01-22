@@ -1,13 +1,8 @@
 package main;
 
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import utils.InputReader;
 
 public class Main {
 	/*
@@ -22,35 +17,15 @@ public class Main {
 	}
 	*/
 	
-	public static void readJsonFromFile() {
-	  JSONParser parser = new JSONParser();
-	  
-	  //JSONObject a = (JSONObject) parser.parse(new FileReader(FilePaths.environmentFile));
-		Object obj;
+	public static void main(String[] args) {
+		//testWriteJson();
+		InputReader inputReader = new InputReader();
 		try {
-			obj = parser.parse(new FileReader(FilePaths.environmentFile));
-		 
-
-		  JSONObject jsonObject = (JSONObject) obj;  
-		  String pageName = jsonObject.get("FileName").toString();
-		  System.out.println(pageName);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			inputReader.readInput();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		  
-	}
-	
-	
-	public static void main(String[] args) {
-		//testWriteJson();
-		readJsonFromFile();
 	}
 
 }
