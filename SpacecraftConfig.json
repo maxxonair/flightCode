@@ -4,7 +4,7 @@
 
   "InitialState":
   {
-  "Time_0_ET_s":0,
+  "Time_0_ET":0,
   "InitialMass":2000,
   "Position_IN_x":0.0,
   "Position_IN_y":0.0,
@@ -27,7 +27,66 @@
   "PropulsionConfig":
   {
 
+    "PropulsionSystems":[
+      {
+        "Name":"Primary_System",
+        "ISP_nominal_s":340.0,
+        "MaxThrust":600.0,
+        "MinThrust":50.0,
+        "MIB_s":5.0,
+        "PropelantMass_1":500,
+        "PropelantMass_2":400,
+        "ThrottleModel_index":1,
+
+        "ThrusterPosition_SCB":
+        [
+          [0.9],
+          [1.2],
+          [0.05]
+        ],
+        "ThrustVector_SCB":
+        [
+          [1.0],
+          [0.0],
+          [0.0]
+        ]
+      },
+      {
+        "Name":"Secondary_System",
+        "ISP_nominal_s":320.0,
+        "MaxThrust":10.0,
+        "MinThrust":10.0,
+        "MIB_s":0.005,
+        "PropelantMass_1":50,
+        "PropelantMass_2":50,
+        "ThrottleModel_index":0,
+
+        "ThrusterPosition_SCB":
+        [
+          [0.9,0.9,0.9,0.9,0.9,0.9],
+          [0.0,0.0,0.0,0.0,0.0,0.0],
+          [0.0,0.0,0.0,0.0,0.0,0.0]
+        ],
+        "ThrustVector_SCB":
+        [
+          [1.0,0.0,0.0,-1.0, 0.0, 0.0],
+          [0.0,1.0,0.0, 0.0,-1.0, 0.0],
+          [0.0,0.0,1.0, 0.0, 0.0,-1.0]
+        ]
+      }
+    ]
+
   },
+
+  "GeometricConfig":
+  {
+
+  },
+
+  "AeroConfig":
+  {
+    "SurfaceArea":50
+  }
 
   "GNCconfig":
   {

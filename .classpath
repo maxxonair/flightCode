@@ -11,11 +11,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/x/Documents/003_Tools/32_FlightCode/flightCode/libraries/json-20201115.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Users/x/Documents/003_Tools/32_FlightCode/flightCode/libraries/json-simple-1.1.jar">
 		<attributes>
 			<attribute name="module" value="true"/>

@@ -3,6 +3,5 @@ module flightCode {
 	requires javafx.graphics;
 	requires javafx.controls;
 	requires commons.math3;
-	requires org.json;
 	requires json.simple;
 }

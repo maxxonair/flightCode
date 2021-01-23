@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -238,6 +240,13 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 	}
 	
 	try {
+		value = Double.parseDouble( initialState.get("Time_0_ET").toString() );
+		spaceShip.getState().setGlobalTime(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
 		value = Double.parseDouble( initialState.get("Position_IN_Longitude_deg").toString() );
 		spaceShip.getState().setInitLongitude(value);
 	} catch (Exception exp) {
@@ -258,6 +267,89 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 		exp.printStackTrace();
 	}
 	
+	try {
+		value = Double.parseDouble( initialState.get("Velocity_magnitude").toString() );
+		spaceShip.getState().setInitVelocity(value);;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+
+	try {
+		value = Double.parseDouble( initialState.get("FlightPathAngle_deg").toString() );
+		spaceShip.getState().setInitFpa(value);;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Azimuth_deg").toString() );
+		spaceShip.getState().setInitAzimuth(value);;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	Quaternion initialAttitude = new Quaternion();
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Quaternion_IN_from_SCB_w").toString() );
+		initialAttitude.w = value;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Quaternion_IN_from_SCB_x").toString() );
+		initialAttitude.x = value;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Quaternion_IN_from_SCB_y").toString() );
+		initialAttitude.y = value;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Quaternion_IN_from_SCB_z").toString() );
+		initialAttitude.z = value;
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	spaceShip.getState().setInitialQuaternion(initialAttitude);
+	
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Rate_SCB_wrt_IN_SCB_deg_s_x").toString() );
+		spaceShip.getState().setInitRotationalRateX(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Rate_SCB_wrt_IN_SCB_deg_s_y").toString() );
+		spaceShip.getState().setInitRotationalRateY(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( initialState.get("Attitude_Rate_SCB_wrt_IN_SCB_deg_s_z").toString() );
+		spaceShip.getState().setInitRotationalRateZ(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	// Read Propulsion Systems
+	System.out.println(propulsionConfig.get("PropulsionSystems").toString());
+	
+	try {
+
+        JSONArray slideContent = (JSONArray) propulsionConfig.get("PropulsionSystems");
+        Iterator i = slideContent.iterator();
+
+        while (i.hasNext()) {
+        	JSONObject propulsionSystem = (JSONObject) i.next();
+        	System.out.println(propulsionSystem.get("Name"));
+        }
+	} catch (Exception exp ) {
+		exp.printStackTrace();
+	}
 	
 	return spaceShip;
 }

@@ -13,7 +13,8 @@
   "ParachuteConstDragCoeff":0.8
 },
 
-"IntegratorConfig":{
+"IntegratorConfig":
+{
 "Integrator_index":1,
 "IntegratorFrequency":2,
 "CoordinateSystem_indx":0,
