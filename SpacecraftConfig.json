@@ -22,6 +22,11 @@
   "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_x":0.0,
   "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_y":0.0,
   "Attitude_Rate_SCB_wrt_IN_SCB_deg_s_z":0.0,
+  "InertiaTensor":[
+    [1000.0,   0.0,    0.0],
+    [0.0   ,1000.0,    0.0],
+    [0.0   ,   0.0, 1000.0]
+  ]
   }
 
   "PropulsionConfig":
@@ -86,11 +91,19 @@
   "AeroConfig":
   {
     "SurfaceArea":50
-  }
+  },
 
   "GNCconfig":
   {
-
+    "Sequence":[
+      {
+        "Name":"InititalDescent",
+        "FlightController_index":0,
+        "EventManagement_index":0,
+        "EndCondition_index":0,
+        "EndCondition_value":500
+      }
+    ]
   },
 
   "SensorConfig":

@@ -1,6 +1,5 @@
 package utils;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import org.json.simple.parser.ParseException;
 
 import FlightElement.SpaceShip;
 import FlightElement.GNCModel.SequenceContent;
-import FlightElement.GNCModel.SequenceElement;
 import Simulator_main.DataSets.IntegratorData;
 import Simulator_main.DataSets.SimulatorInputSet;
 import main.FilePaths;
@@ -28,135 +26,11 @@ public class InputReader {
  * 
  */
 
-	 double[] IntegInput =  new double[5];
+public  Quaternion qVector = new Quaternion(1,0,0,0);
 	
-	public  Quaternion qVector = new Quaternion(1,0,0,0);
-	
-	 double[][] InertiaTensor   = {{   0 ,  0  ,   0},
-			  					  		 {   0 ,  0  ,   0},
-			  					  		 {   0 ,  0  ,   0}};  // Inertia Tensor []
 
 public InputReader() {
 	
-}
-	
-public  String[] IntegratorInputPath = {System.getProperty("user.dir") + "/INP/INTEG/00_DormandPrince853Integrator.inp",
-   			System.getProperty("user.dir") + "/INP/INTEG/01_ClassicalRungeKuttaIntegrator.inp",
-   			System.getProperty("user.dir") + "/INP/INTEG/02_GraggBulirschStoerIntegrator.inp",
-   			System.getProperty("user.dir") + "/INP/INTEG/03_AdamsBashfordIntegrator.inp"
-};
-   	
-//------------------------------------------------------	-----------------------------------------------------
-public  void updateSequenceElements(SequenceElement NewElement, List<SequenceElement> SEQUENCE_DATA){	   
-		   if (SEQUENCE_DATA.size()==0){
-				  SEQUENCE_DATA.add(NewElement); 
-		   } else {
-			boolean element_exist = false   ;
-			  for(int i=0; i<SEQUENCE_DATA.size(); i++){
-				  int ID_LIST    = SEQUENCE_DATA.get(i).get_sequence_ID();
-				  int ID_ELEMENT = NewElement.get_sequence_ID();
-						  if (ID_LIST == ID_ELEMENT){
-							  // item exists -> Update
-							  SEQUENCE_DATA.get(i).Update(NewElement.get_sequence_ID(),NewElement.get_trigger_end_type(), NewElement.get_trigger_end_value(),NewElement.get_sequence_type(),NewElement.get_sequence_controller_ID(), NewElement.get_ctrl_target_vel(), NewElement.get_ctrl_target_alt(), NewElement.get_ctrl_target_curve(),NewElement.get_sequence_TVCController_ID(),NewElement.get_TVC_ctrl_target_time(),NewElement.get_TVC_ctrl_target_fpa(),NewElement.get_TVC_ctrl_target_curve());
-							  element_exist = true;
-						  } 
-			  }
-			if (element_exist == false ){
-				  // New item -> add to list  
-				SEQUENCE_DATA.add(NewElement);
-			}	  
-		   } 
-	   }	
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-public  List<SequenceContent> readSequenceFile() throws IOException{	
-	System.out.println("Sequence Manager: Reading Sequences started ... ");
-	List<SequenceContent> SequenceSet = new ArrayList<SequenceContent>();
-	BufferedReader br = new BufferedReader(new FileReader(""));
-   String strLine;
-   String fcSeparator="\\|FlightControllerElements\\|";
-   String eventSeparator="\\|EventManagementElements";
-   String endSeparator="\\|EndElement\\|";
-   try {
-   while ((strLine = br.readLine()) != null )   {
-       
-       	String[] initSplit = strLine.split(fcSeparator);
-
-       	String[] head = initSplit[0].split(" ");
-       //System.out.pri
-       	int  ID = Integer.parseInt(head[0]);
-       	//String sequenceName = head[1];
-       	int flightControllerIndex = Integer.parseInt(initSplit[1].split(" ")[1]);
-       	String[] arr     = strLine.split(eventSeparator);
-       	//System.out.println(arr[1]);
-       	int eventIndex  = Integer.parseInt(arr[1].split(" ")[1]);
-       	
-       	String[] arr2   = strLine.split(endSeparator);
-       	//System.out.println(arr2[1]);
-       	int endIndex    = Integer.parseInt(arr2[1].split(" ")[1]);
-       	double endValue = Double.parseDouble(arr2[1].split(" ")[2]);
-       	
-       	System.out.println("Sequence Manager Added Element: SequID "+ID+ ", FCID "+flightControllerIndex+", EVID "+eventIndex);
-       	
-       	//System.out.println(ID+" "+sequenceName+" "+flightControllerIndex+" "+eventIndex+" "+endIndex+" "+endValue);
-    	    SequenceContent sequenceContent = new SequenceContent();
-    	    sequenceContent.setID(ID);
-	    	//---------------------------------------------------------------------------------------------------
-	    	//					Flight Controller  
-	    	//---------------------------------------------------------------------------------------------------
-    	    if(flightControllerIndex==0) {
-    	    		// No Selection!
-    	    } else if (flightControllerIndex==1) { // roll control
-    	    	sequenceContent.addRollControl();
-    	    } else if (flightControllerIndex==2) { // yaw control
-    	    	sequenceContent.addYawControl();
-    	    } else if (flightControllerIndex==3) { // pitch control
-    	    	sequenceContent.addPitchControl();
-    	    } else if (flightControllerIndex==4) { // roll stabilisation
-    	    	sequenceContent.addRollControl();
-    	    } else if (flightControllerIndex==5) { // full thrust
-    	    	sequenceContent.addPrimaryThrustControl();
-    	    } else if (flightControllerIndex==6) { // ascent controller
-    	    	sequenceContent.addAscentController();
-    	    } else if (flightControllerIndex==7) {
-    	    	// Empty spot
-    	    } else if (flightControllerIndex==8) { // external Controller
-    	    	String scriptName=""; // INSERT SCRIPT NAME method ->TBD!
-    	    	sequenceContent.addExternalControl(scriptName);
-    	    }
-      	//---------------------------------------------------------------------------------------------------
-      	//					Events
-      	//---------------------------------------------------------------------------------------------------
-    	    if(eventIndex==0) {
-    	    	// No Selection!
-    	    } else if (eventIndex==1) {
-    	    	sequenceContent.addParachuteDeployment();
-    	    } else if (eventIndex==2) {
-    	    	sequenceContent.addParachuteSeparation();
-    	    } else if (eventIndex==3) {
-    	    	// Stage Separation tbd
-    	    } else if (eventIndex==4) {
-    	    	sequenceContent.addHeatShieldSeparation();
-    	    }
-        //---------------------------------------------------------------------------------------------------
-        	//					Sequence End
-        	//---------------------------------------------------------------------------------------------------   	    
-    	    sequenceContent.setTriggerEnd(endIndex, endValue);
-        //---------------------------------------------------------------------------------------------------
-        	//					Add Sequence 
-        	//---------------------------------------------------------------------------------------------------  
-    	    String testString = ""+sequenceContent.getID();
-    	    if(!testString.equals("")) {
-    	    		SequenceSet.add(sequenceContent);
-    	    }
-   }
-   br.close();
-   } catch(NullPointerException eNPE) { System.out.println(eNPE);}
-   // Add additional sequence element to avoid reaching undefined space 
-   SequenceContent sequenceContent = new SequenceContent();
-   SequenceSet.add(sequenceContent);
-   System.out.println("Sequence Manager: Reading Sequences completed successfully.");
- return SequenceSet; 
 }
 //---------------------------------------------------------------------------------------------------
 public  SimulatorInputSet readInput() throws IOException{
@@ -184,10 +58,8 @@ public  SimulatorInputSet readInput() throws IOException{
 		  spaceShip = createSpaceship(spacecraft);
 		  integratorData = createIntegratorData(environment);
 		  
-		  // Test outputs
-		  System.out.println(spaceShip.getProperties().getMassAndInertia().getMass());
-		  System.out.println(spaceShip.getState().getInitLongitude());
-		  System.out.println(integratorData.getTargetBody());
+		  simulatorInputSet.setIntegratorData(integratorData);
+		  simulatorInputSet.setSpaceShip(spaceShip);
 		  
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -209,6 +81,8 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 	double value = 0;
 	JSONObject initialState = null;
 	JSONObject propulsionConfig = null;
+	JSONObject geometricConfig = null;
+	JSONObject aeroConfig = null;
 	JSONObject gncConfig = null;
 	JSONObject sensorConfig = null;
 	try {
@@ -218,6 +92,16 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 	}
 	try {
 		 propulsionConfig = (JSONObject) spacecraft.get("PropulsionConfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		aeroConfig = (JSONObject) spacecraft.get("AeroConfig");
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	try {
+		geometricConfig = (JSONObject) spacecraft.get("GeometricConfig");
 	} catch (Exception exp) {
 		exp.printStackTrace();
 	}
@@ -335,9 +219,14 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 		exp.printStackTrace();
 	}
 	
-	// Read Propulsion Systems
-	System.out.println(propulsionConfig.get("PropulsionSystems").toString());
-	
+	// Read Aero Config
+	try {
+		value = Double.parseDouble( aeroConfig.get("SurfaceArea").toString() );
+		spaceShip.getProperties().getAeroElements().setSurfaceArea(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	// Read Propulsion Systems	
 	try {
 
         JSONArray slideContent = (JSONArray) propulsionConfig.get("PropulsionSystems");
@@ -345,14 +234,107 @@ private SpaceShip createSpaceship(JSONObject spacecraft) {
 
         while (i.hasNext()) {
         	JSONObject propulsionSystem = (JSONObject) i.next();
-        	System.out.println(propulsionSystem.get("Name"));
+        	
+        	try {
+        		value = Double.parseDouble( propulsionSystem.get("ISP_nominal_s").toString() );
+        		spaceShip.getProperties().getPropulsion().setPrimaryISPMax(value);
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
         }
 	} catch (Exception exp ) {
 		exp.printStackTrace();
 	}
-	
+	// Read Sequence	
+	List<SequenceContent> SequenceSet = new ArrayList<SequenceContent>();
+	try {
+
+        JSONArray sequenceC = (JSONArray) gncConfig.get("Sequence");
+        Iterator sequence = sequenceC.iterator();
+        int ID =0;
+        while (sequence.hasNext()) {
+        	JSONObject sequenceElement = (JSONObject) sequence.next();
+    	    SequenceContent sequenceContent = new SequenceContent();
+    	    sequenceContent.setID(ID);
+        	String name="";
+        	int fc =0;
+        	int event =0;
+        	int end = 0;
+        	double endVal = 0;
+        	try {
+        		name =  sequenceElement.get("Name").toString() ;
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
+        	try {
+        		fc =  Integer.parseInt( sequenceElement.get("FlightController_index").toString() );
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
+        	try {
+        		event =  Integer.parseInt( sequenceElement.get("EventManagement_index").toString() );
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
+        	try {
+        		end =  Integer.parseInt( sequenceElement.get("EndCondition_index").toString() );
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
+        	try {
+        		endVal =  Double.parseDouble( sequenceElement.get("EndCondition_value").toString() );
+        	} catch (Exception exp) {
+        		exp.printStackTrace();
+        	}
+        	
+	    	if(fc==0) {
+		    		// No Selection!
+		    } else if (fc==1) { // roll control
+		    	sequenceContent.addRollControl();
+		    } else if (fc==2) { // yaw control
+		    	sequenceContent.addYawControl();
+		    } else if (fc==3) { // pitch control
+		    	sequenceContent.addPitchControl();
+		    } else if (fc==4) { // roll stabilisation
+		    	sequenceContent.addRollControl();
+		    } else if (fc==5) { // full thrust
+		    	sequenceContent.addPrimaryThrustControl();
+		    } else if (fc==6) { // ascent controller
+		    	sequenceContent.addAscentController();
+		    } else if (fc==7) {
+		    	// Empty spot
+		    } else if (fc==8) { // external Controller
+		    	String scriptName=""; // INSERT SCRIPT NAME method ->TBD!
+		    	sequenceContent.addExternalControl(scriptName);
+		    }
+        	
+    	    if(event==0) {
+    	    	// No Selection!
+    	    } else if (event==1) {
+    	    	sequenceContent.addParachuteDeployment();
+    	    } else if (event==2) {
+    	    	sequenceContent.addParachuteSeparation();
+    	    } else if (event==3) {
+    	    	// Stage Separation tbd
+    	    } else if (event==4) {
+    	    	sequenceContent.addHeatShieldSeparation();
+    	    }
+  	    
+    	    sequenceContent.setTriggerEnd(end, endVal);
+    	    
+    	    SequenceSet.add(sequenceContent);
+        	ID++;
+        }
+	} catch (Exception exp ) {
+		exp.printStackTrace();
+	}
+	   SequenceContent sequenceContent = new SequenceContent();
+	   SequenceSet.add(sequenceContent);
+	   spaceShip.getProperties().getSequence().setSequenceSet(SequenceSet);
+	   
 	return spaceShip;
 }
+
 
 private IntegratorData createIntegratorData(JSONObject environment) {
 	IntegratorData integratorData = new IntegratorData(); 
@@ -373,178 +355,130 @@ private IntegratorData createIntegratorData(JSONObject environment) {
 	}
 	
 	try {
+		value = Double.parseDouble( integConfig.get("StepSize_s").toString() );
+		integratorData.setFixedTimestep(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( integConfig.get("MinimumStepsize_s").toString() );
+		integratorData.setMinTimestep(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( integConfig.get("MaximumStepsize_s").toString() );
+		integratorData.setMaxTimestep(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( integConfig.get("AbsoluteTolerance").toString() );
+		integratorData.setAbsTol(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( integConfig.get("RelativeTolerance").toString() );
+		integratorData.setRelTol(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( integConfig.get("NumberOfSteps").toString() );
+		integratorData.setNrSteps(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( integConfig.get("Integrator_index").toString() );
+		integratorData.setIntegratorType(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( integConfig.get("IntegratorFrequency").toString() );
+		integratorData.setEnvironmentFrequency(value);	
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( integConfig.get("DegreeOfFreedom").toString() );
+		integratorData.setDegreeOfFreedom(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
 		intVal = Integer.parseInt( envConfig.get("TargetBody_indx").toString() );
 		integratorData.setTargetBody(intVal);
 	} catch (Exception exp) {
 		exp.printStackTrace();
 	}
 	
-	return integratorData;
-}
-/*
-private  SpaceShip checkSpaceShip(String identifier, double value, SpaceShip spaceShip) {
-	if(identifier.equals("Init_LONG")) {
-		spaceShip.getState().setInitLongitude(value*UConst.deg2rad);
-	} else if (identifier.equals("Init_LAT")) {
-		spaceShip.getState().setInitLatitude(value*UConst.deg2rad);
-	} else if (identifier.equals("Init_RAD")) {
-		spaceShip.getState().setInitRadius(value);
-	} else if (identifier.equals("Init_VEL")) {
-		spaceShip.getState().setInitVelocity(value);
-	} else if (identifier.equals("Init_FPA")) {
-		spaceShip.getState().setInitFpa(value*UConst.deg2rad);
-	} else if (identifier.equals("Init_AZI")) {
-		spaceShip.getState().setInitAzimuth(value*UConst.deg2rad);
-	} else if (identifier.equals("Init_AngRateX")) {
-		spaceShip.getState().setInitRotationalRateX(value*UConst.deg2rad);	
-	} else if (identifier.equals("Init_AngRateY")) {
-		spaceShip.getState().setInitRotationalRateY(value*UConst.deg2rad);	
-	} else if (identifier.equals("Init_AngRateZ")) {
-		spaceShip.getState().setInitRotationalRateZ(value*UConst.deg2rad);	
-	} else if(identifier.equals("Init_Mass")) {
-		spaceShip.getProperties().getMassAndInertia().setMass(value);
-	} else if (identifier.equals("SC_COM")) {
-		spaceShip.getProperties().getMassAndInertia().setCoM(value);
-	} else if (identifier.equals("SC_COT")) {
-		spaceShip.getProperties().getGeometry().setCoT(value);
-	} else if (identifier.equals("SC_COP")) {
-		spaceShip.setCoP(value);
-	} else if (identifier.equals("SC_Height")) {
-		spaceShip.getProperties().getGeometry().setVehicleLength(value);
-	} else if (identifier.equals("SC_ParDiam")) {
-		spaceShip.getProperties().getAeroElements().setParachuteSurfaceArea(UConst.PI*(value*value/4));
-	} else if (identifier.equals("SC_BodyRadius")) {
-		spaceShip.getProperties().getAeroElements().setHeatshieldRadius(value/2);
-	} else if (identifier.equals("SC_ParMass")) {
-    		spaceShip.getProperties().getAeroElements().setParachuteMass(value);
-	} else if (identifier.equals("SC_HeatShieldMass")) {
-		spaceShip.getProperties().getAeroElements().setHeatShieldMass(value);
-	} else if (identifier.equals("SC_SurfArea")) {
-		spaceShip.getProperties().getAeroElements().setSurfaceArea(UConst.PI*(value*value/4));
-	} else if (identifier.equals("Init_IXX")) {
-		InertiaTensor[0][0] = value;
-	} else if (identifier.equals("Init_IXY")) {
-		InertiaTensor[0][1] = value;
-	} else if (identifier.equals("Init_IXZ")) {
-		InertiaTensor[0][2] = value;
-	} else if (identifier.equals("Init_IYX")) {
-		InertiaTensor[1][0] = value;
-	} else if (identifier.equals("Init_IYY")) {
-		InertiaTensor[1][1] = value;
-	} else if (identifier.equals("Init_IYZ")) {
-		InertiaTensor[1][2] = value;
-	} else if (identifier.equals("Init_IZX")) {
-		InertiaTensor[2][0] = value;
-	} else if (identifier.equals("Init_IZY")) {
-		InertiaTensor[2][1] = value;
-	} else if (identifier.equals("Init_IZZ")) {
-		InertiaTensor[2][2] = value;
-	} else if (identifier.equals("SC_MainISP")) {
-		spaceShip.getProperties().getPropulsion().setPrimaryISPMax(value);
-	} else if (identifier.equals("SC_MainProp")) {
-		spaceShip.getProperties().getPropulsion().setPrimaryPropellant(value);
-	} else if (identifier.equals("SC_MainThrustMax")) {
-		spaceShip.getProperties().getPropulsion().setPrimaryThrustMax(value);
-	} else if (identifier.equals("SC_MainThrustMin")) {
-		spaceShip.getProperties().getPropulsion().setPrimaryThrustMin(value);
-	} else if (identifier.equals("SC_RCSMomX")) {
-		spaceShip.getProperties().getPropulsion().setRCSMomentumX(value);
-	} else if (identifier.equals("SC_RCSMomY")) {
-		spaceShip.getProperties().getPropulsion().setRCSMomentumY(value);
-	} else if (identifier.equals("SC_RCSMomZ")) {
-		spaceShip.getProperties().getPropulsion().setRCSMomentumZ(value);
-	} else if (identifier.equals("SC_RCSProp")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryPropellant(value);
-	} else if (identifier.equals("SC_RCSISPX")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryISP_RCS_X(value);
-	} else if (identifier.equals("SC_RCSISPY")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryISP_RCS_Y(value);
-	} else if (identifier.equals("SC_RCSISPZ")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryISP_RCS_Z(value);
-	} else if (identifier.equals("SC_RCSThrustX")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryThrust_RCS_X(value);
-	} else if (identifier.equals("SC_RCSThrustY")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryThrust_RCS_Y(value);
-	} else if (identifier.equals("SC_RCSThrustZ")) {
-		spaceShip.getProperties().getPropulsion().setSecondaryThrust_RCS_Z(value);
-	} else if (identifier.equals("SC_MainISPModel")) {
-    		if((int) value ==1) {
-    			spaceShip.getProperties().getPropulsion().setIsPrimaryThrottleModel(true);
-    		} else {
-    			spaceShip.getProperties().getPropulsion().setIsPrimaryThrottleModel(false);	
-    		}
-	} else if (identifier.equals("SC_MainISPMin")) {
-		spaceShip.getProperties().getPropulsion().setPrimaryISPMin(value);
-	} 
-	
-	return spaceShip;
-}
-
-private  IntegratorData checkIntegratorData(String identifier, double value, IntegratorData integratorData) {
-			if (identifier.equals("Integ_MaxTime")) {
+	try {
+		value = Double.parseDouble( integConfig.get("IntegrationTime_s").toString() );
+		integratorData.setMaxIntegTime(value);
 		integratorData.setMaxGlobalTime(value);
-		integratorData.setGlobalTime(0);
-	} else if (identifier.equals("Integ_Integrator")) {
-
-	} else if (identifier.equals("Integ_VelVector")) {
-		integratorData.setVelocityVectorCoordSystem((int) value);	
-	} else if (identifier.equals("Env_CenterBody")) {
-		integratorData.setTargetBody((int) value);	
-	} else if (identifier.equals("Env_RefElev")) {
-		integratorData.setRefElevation( value);	
-	} else if (identifier.equals("Env_CenterBody")) {
-		integratorData.setTargetBody((int) value);	
-	} else if (identifier.equals("Env_DragModel")) {
-		integratorData.setAeroDragModel((int) value);	
-	} else if (identifier.equals("Env_ParModel")) {
-		integratorData.setAeroParachuteModel((int) value);	
-	} else if (identifier.equals("Env_ParCD")) {
-		integratorData.setConstParachuteCd( value);	
-	} else if (identifier.equals("Integ_DoF")) {
-		integratorData.setDegreeOfFreedom((int) value);	
-	} else if (identifier.equals("Init_QuartW")) {
-		qVector.w = value;	
-	} else if (identifier.equals("Init_QuartX")) {
-		qVector.x = value;	
-	} else if (identifier.equals("Init_QuartY")) {
-		qVector.y = value;	
-	} else if (identifier.equals("Init_QuartZ")) {
-		qVector.z = value;	
-	} else if (identifier.equals("Integ_853_MinStep")) {
-		IntegInput[0] = value;	
-	} else if (identifier.equals("Integ_853_MaxStep")) {
-		IntegInput[1] = value;	
-	} else if (identifier.equals("Integ_853_AbsTol")) {
-		IntegInput[2] = value;	
-	} else if (identifier.equals("Integ_853_RelTol")) {
-		IntegInput[3] = value;	
-	} else if (identifier.equals("Integ_RungKut_Step")) {
-		IntegInput[0] = value;	
-	} else if (identifier.equals("Integ_GraBul_MinStep")) {
-		IntegInput[0] = value;	
-	} else if (identifier.equals("Integ_GraBul_MaxStep")) {
-		IntegInput[1] = value;	
-	} else if (identifier.equals("Integ_GraBul_AbsTol")) {
-		IntegInput[2] = value;	
-	} else if (identifier.equals("Integ_GraBul_RelTol")) {
-		IntegInput[3] = value;	
-	} else if (identifier.equals("Integ_AdBash_Steps")) {
-		IntegInput[0] = value;	
-	} else if (identifier.equals("Integ_AdBash_MinStep")) {
-		IntegInput[1] = value;	
-	} else if (identifier.equals("Integ_AdBash_MaxStep")) {
-		IntegInput[2] = value;	
-	} else if (identifier.equals("Integ_AdBash_AbsTol")) {
-		IntegInput[3] = value;	
-	} else if (identifier.equals("Integ_AdBash_RelTol")) {
-		IntegInput[4] = value;	
-	} else if (identifier.equals("Integ_Frequency")) {
-		integratorData.setEnvironmentFrequency(value);	
-		integratorData.setMaxIntegTime(1/value);
-	} 
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( integConfig.get("CoordinateSystem_indx").toString() );
+		integratorData.setVelocityVectorCoordSystem(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( envConfig.get("TargetBody_ReferenceElevation").toString() );
+		integratorData.setRefElevation(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( envConfig.get("AtmosphericDragModel_indx").toString() );
+		integratorData.setAeroDragModel(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		intVal = Integer.parseInt( envConfig.get("ParachuteModel_indx").toString() );
+		integratorData.setAeroParachuteModel(intVal);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
+	
+	try {
+		value = Double.parseDouble( envConfig.get("ParachuteConstDragCoeff").toString() );
+		integratorData.setConstParachuteCd(value);
+	} catch (Exception exp) {
+		exp.printStackTrace();
+	}
 	
 	return integratorData;
 }
-*/
 
+// Unit Tester
+public static void main(String[] args) {
+	//testWriteJson();
+	InputReader inputReader = new InputReader();
+	try {
+		inputReader.readInput();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+}
+}
 }

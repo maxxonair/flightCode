@@ -15,31 +15,37 @@ public class IntegratorData {
 	
 	private int targetBody;	
 	
-	private double maxIntegTime;
-	private double integTimeStep;
+	private double maxIntegTime=1;
+	private double integTimeStep=1;
 	
-	private double maxGlobalTime;
+	private double maxGlobalTime=100;
 	
 	private double globalTime=0;
 	
-	private double refElevation;
+	private double refElevation=0;
 	
 	List<StopCondition> IntegStopHandler = new ArrayList<StopCondition>();
 	
-	private int velocityVectorCoordSystem;
-	private int degreeOfFreedom;
+	private int velocityVectorCoordSystem=0;
+	private int degreeOfFreedom=6;
 	
-	double[] IntegInput;
 	
 	double environmentFrequency=1;
 	
-	int IntegratorType;
+	int IntegratorType=1;
 	
-	int AeroDragModel;
-	int AeroParachuteModel;
-	double ConstParachuteCd;
+	int AeroDragModel=0;
+	int AeroParachuteModel=1;
+	double ConstParachuteCd=0.8;
 	
 	private double groundtrack=0;
+	
+	double fixedTimestep=0.5;
+	double minTimestep=0;
+	double maxTimestep=0;
+	double relTol =0;
+	double absTol =0;
+	int nrSteps=10;
 	
 	private NoiseModel noiseModel = new NoiseModel();
 	
@@ -55,16 +61,6 @@ public class IntegratorData {
 	public void setGroundtrack(double groundtrack) {
 		this.groundtrack = groundtrack;
 	}
-	
-
-	private double[][] angularRate = {	{1},
-	{0},
-	{0}}; 
-	
-	public double[][] getAngularRate() {
-		return angularRate;
-	}
-
 
 	public double getGlobalTime() {
 		return globalTime;
@@ -74,12 +70,6 @@ public class IntegratorData {
 	public void setGlobalTime(double globalTime) {
 		this.globalTime = globalTime;
 	}
-
-
-	public void setAngularRate(double[][] angularRate) {
-		this.angularRate = angularRate;
-	}
-	
 
 	public int getAeroParachuteModel() {
 		return AeroParachuteModel;
@@ -110,16 +100,6 @@ public class IntegratorData {
 
 
 	FirstOrderIntegrator Integrator;
-	
-	public double[] getIntegInput() {
-		return IntegInput;
-	}
-
-
-	public void setIntegInput(double[] integInput) {
-		IntegInput = integInput;
-	}
-
 
 	public int getIntegratorType() {
 		return IntegratorType;
@@ -139,13 +119,13 @@ public class IntegratorData {
 	public void setIntegratorType(int integratorType) {
 		IntegratorType = integratorType;
 		if (IntegratorType == 1) {
-			Integrator = new ClassicalRungeKuttaIntegrator(IntegInput[0]);
+			Integrator = new ClassicalRungeKuttaIntegrator(fixedTimestep);
 		} else if (IntegratorType == 0) {
-			Integrator = new DormandPrince853Integrator(IntegInput[0], IntegInput[1], IntegInput[2], IntegInput[3]);
+			Integrator = new DormandPrince853Integrator(minTimestep, maxTimestep, absTol, relTol);
 		} else if (IntegratorType ==2){
-			Integrator = new GraggBulirschStoerIntegrator(IntegInput[0], IntegInput[1], IntegInput[2], IntegInput[3]);
+			Integrator = new GraggBulirschStoerIntegrator(minTimestep, maxTimestep, absTol, relTol);
 		} else if (IntegratorType == 3){
-			Integrator = new AdamsBashforthIntegrator((int) IntegInput[0], IntegInput[1], IntegInput[2], IntegInput[3], IntegInput[4]);
+			Integrator = new AdamsBashforthIntegrator((int) nrSteps, minTimestep, maxTimestep, absTol, relTol);
 		} else {
 			// Default Value
 			System.out.println("Integrator index out of range");
@@ -240,6 +220,54 @@ public class IntegratorData {
 
 	public void setEnvironmentFrequency(double frequency) {
 		environmentFrequency = frequency;
+	}
+
+	public double getFixedTimestep() {
+		return fixedTimestep;
+	}
+
+	public void setFixedTimestep(double fixedTimestep) {
+		this.fixedTimestep = fixedTimestep;
+	}
+
+	public double getMinTimestep() {
+		return minTimestep;
+	}
+
+	public void setMinTimestep(double minTimestep) {
+		this.minTimestep = minTimestep;
+	}
+
+	public double getMaxTimestep() {
+		return maxTimestep;
+	}
+
+	public void setMaxTimestep(double maxTimestep) {
+		this.maxTimestep = maxTimestep;
+	}
+
+	public double getRelTol() {
+		return relTol;
+	}
+
+	public void setRelTol(double relTol) {
+		this.relTol = relTol;
+	}
+
+	public double getAbsTol() {
+		return absTol;
+	}
+
+	public void setAbsTol(double absTol) {
+		this.absTol = absTol;
+	}
+
+	public int getNrSteps() {
+		return nrSteps;
+	}
+
+	public void setNrSteps(int nrSteps) {
+		this.nrSteps = nrSteps;
 	}
 	
 }

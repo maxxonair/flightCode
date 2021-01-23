@@ -38,7 +38,7 @@ public class Simulation {
 		this.progressStep = progressStep;
 	}
 	
-    public void launchSimulation() {
+    public void launch() {
     	String timeStamp = new SimpleDateFormat("dd / MM / yy   HH : mm : ss").format(Calendar.getInstance().getTime());
     	System.out.println("------------------------------------------");
     	System.out.println(""+timeStamp);
@@ -92,13 +92,6 @@ public class Simulation {
 	    		//integratorData.getNoiseModel().setSensorNoiseModel(true);      	 // TBD
 	    		integratorData.getNoiseModel().setActuatorNoiseModel(true);
 	    		//--------------------------------------------------------------------------------------
-	        	try {
-					spaceShip.getProperties().getSequence().setSequenceSet(inputReader.readSequenceFile());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					System.out.println("Error: Reading Mode Management failed.");
-				}
 	    		// Rate Transition blocks - Spacecraft 
 	    		spaceShip.getProperties().getoBC().setControllerFrequency(10);
 	    		spaceShip.getProperties().getSensors().setSensorFrequency(20);
@@ -116,6 +109,8 @@ public class Simulation {
 		    	System.out.println("------------------------------------------");
 		    	System.out.println("Start SIMULATION :");
 		    	System.out.println("------------------------------------------");
+		    	System.out.println("Max Integ time s: "+tGlobal);
+		    	System.out.println("Time increment s: "+tIncrement);
 		    	
 for(double tIS=0;tIS<tGlobal;tIS+=tIncrement) {
 		    	// Progress Write Out: 
@@ -237,7 +232,7 @@ for(double tIS=0;tIS<tGlobal;tIS+=tIncrement) {
     public static void main(String[] args) {
     	// Execute Simulation:
     	Simulation simulation = new Simulation(true, 2.0);
-    	simulation.launchSimulation();
+    	simulation.launch();
     }
 
 }

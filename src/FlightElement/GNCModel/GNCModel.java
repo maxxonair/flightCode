@@ -1,5 +1,6 @@
 package FlightElement.GNCModel;
 
+
 import FlightElement.SpaceShip;
 
 public class GNCModel {
@@ -11,12 +12,11 @@ public class GNCModel {
 	
 	double CTRLfrequencyIN;
 	double CTRLfrequencyOUT;
-	
-	
+		
 	public GNCModel(SpaceShip spaceShip) {
 		masterController = new MasterController(spaceShip);
 		controlCommandSet = new ControlCommandSet();
-		
+
 	}
 
 	public ControlCommandSet getControlCommandSet() {
